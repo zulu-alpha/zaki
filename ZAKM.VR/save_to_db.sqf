@@ -52,7 +52,7 @@ save_description = {
 	params ["_db_name", "_config"];
 	// Human readable name
 	[
-		"python.zakm_ingestion.save_to_db",
+		"python.zakm_ingestion.add_to_db",
 		[
 			_db_name,
 			configName _config,
@@ -62,7 +62,7 @@ save_description = {
 	] call py3_fnc_callExtension;
 	// Description
 	[
-		"python.zakm_ingestion.save_to_db",
+		"python.zakm_ingestion.add_to_db",
 		[
 			_db_name,
 			configName _config,
@@ -80,7 +80,7 @@ save_magazines = {
 		[_db_name, _config] call save_description;
 		// Mass
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[
 				_db_name,
 				_x,
@@ -99,7 +99,7 @@ save_items = {
 		[_db_name, _config] call save_description;
 		// Mass
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[
 				_db_name,
 				_x,
@@ -128,7 +128,7 @@ save_weapon = {
 		[_db_name_weapon, _x] call save_description;
 		// Mass
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[
 				_db_name_weapon,
 				_config_name,
@@ -142,7 +142,7 @@ save_weapon = {
 		[_magazines, _primary_magazines_common] call add_unique_to_list;
 		// Save primary mags to DB
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[_db_name_weapon, _config_name, _KEY_MAGAZINES, _magazines]
 		] call py3_fnc_callExtension;
 		// Alternate magazines (such as grenade launcher). There can be multiple alternate
@@ -157,34 +157,34 @@ save_weapon = {
 		} forEach ([_x] call alternate_muzzle_configs);
 		// Save alternate mags to DB
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[_db_name_weapon, _config_name, _KEY_ALTERNATE_MAGAZINES, _magazines]
 		] call py3_fnc_callExtension;
 		// Save muzzle attachments
 		private _attachment_names = [_config_name, "muzzle"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[_db_name_weapon, _config_name, _KEY_MUZZLE_ATTACHMENTS, _attachment_names]
 		] call py3_fnc_callExtension;
 		[_attachment_names, _MUZZLE_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save optic attachments
 		private _attachment_names = [_config_name, "optic"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[_db_name_weapon, _config_name, _KEY_OPTIC_ATTACHMENTS, _attachment_names]
 		] call py3_fnc_callExtension;
 		[_attachment_names, _OPTIC_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save pointer attachments
 		private _attachment_names = [_config_name, "pointer"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[_db_name_weapon, _config_name, _KEY_POINTER_ATTACHMENTS, _attachment_names]
 		] call py3_fnc_callExtension;
 		[_attachment_names, _POINTER_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save bipod attachments
 		private _attachment_names = [_config_name, "bipod"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.save_to_db",
+			"python.zakm_ingestion.add_to_db",
 			[_db_name_weapon, _config_name, _KEY_BIPOD_ATTACHMENTS, _attachment_names]
 		] call py3_fnc_callExtension;
 		[_attachment_names, _BIPOD_ATTACHMENTS_COMMON] call add_unique_to_list;
