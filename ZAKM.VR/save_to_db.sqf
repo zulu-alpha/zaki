@@ -1,27 +1,23 @@
-2call compile preProcessFile "\iniDB\init.sqf";
-
 // Common variables
-private _key_display_name = "display_name";
-private _key_description = "description";
-private _key_mass = "mass";
-private _key_magazines = "magazines";
-private _key_alternate_magazines = "alternate_magazines";
+private _KEY_DISPLAY_NAME = "display_name";
+private _KEY_DESCRIPTION = "description";
+private _KEY_MASS = "mass";
+private _KEY_MAGAZINES = "magazines";
+private _KEY_ALTERNATE_MAGAZINES = "alternate_magazines";
 
-private _key_muzzle_attachments = "muzzle_attachments";
-private _key_optic_attachments = "optic_attachments";
-private _key_pointer_attachments = "pointer_attachments";
-private _key_bipod_attachments = "bipod_attachments";
+private _KEY_MUZZLE_ATTACHMENTS = "muzzle_attachments";
+private _KEY_OPTIC_ATTACHMENTS = "optic_attachments";
+private _KEY_POINTER_ATTACHMENTS = "pointer_attachments";
+private _KEY_BIPOD_ATTACHMENTS = "bipod_attachments";
 
+private _MUZZLE_ATTACHMENTS_COMMON = [];
+private _OPTIC_ATTACHMENTS_COMMON = [];
+private _POINTER_ATTACHMENTS_COMMON = [];
+private _BIPOD_ATTACHMENTS_COMMON = [];
 
 /*
 	Helper functions
 */
-// Removes " from string and return a string what is missing those.
-sanatize_inches = {
-	((_this select 0) splitString (toString [34])) joinString ""
-};
-
-
 add_unique_to_list = {
 	params ["_source_array", "_append_array"];
 	{
@@ -34,7 +30,8 @@ weapon_configs = {
 	private _config = (configFile >> "CfgWeapons");
 	configProperties [
 		_config,
-		// Is of the correct kind, is intended for the user to see (scope == 2) and has no attatchements
+		// Is of the correct kind, is intended for the user to see (scope == 2) and has 
+		// no attatchements
 		"(configName _x isKindOf [_base_class, _config])
 			and (getNumber (_x >> 'scope') == 2)
 			and !isClass (_x >> 'LinkedItems')",
@@ -54,9 +51,25 @@ alternate_muzzle_configs = {
 save_description = {
 	params ["_db_name", "_config"];
 	// Human readable name
-	[_db_name, configName _config, _key_display_name, [getText (_config >> "displayName")] call sanatize_inches] call iniDB_write;
+	[
+		"python.zakm_ingestion.save_to_db",
+		[
+			_db_name,
+			configName _config,
+			_KEY_DISPLAY_NAME,
+			getText (_config >> "displayName")
+		]
+	] call py3_fnc_callExtension;
 	// Description
-	[_db_name, configName _config, _key_description, [getText (_config >> "descriptionShort")] call sanatize_inches] call iniDB_write;
+	[
+		"python.zakm_ingestion.save_to_db",
+		[
+			_db_name,
+			configName _config,
+			_KEY_DESCRIPTION,
+			getText (_config >> "descriptionShort")
+		]
+	] call py3_fnc_callExtension;
 };
 
 save_magazines = {
@@ -66,7 +79,15 @@ save_magazines = {
 		// Description
 		[_db_name, _config] call save_description;
 		// Mass
-		[_db_name, _x, _key_mass, getNumber (_config >> "mass")] call iniDB_write;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[
+				_db_name,
+				_x,
+				_KEY_MASS,
+				getNumber (_config >> "mass")
+			]
+		] call py3_fnc_callExtension;
 	} forEach _magazines;
 };
 
@@ -77,12 +98,25 @@ save_items = {
 		// Description
 		[_db_name, _config] call save_description;
 		// Mass
-		[_db_name, _x, _key_mass, getNumber (_config >> "ItemInfo" >> "mass")] call iniDB_write;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[
+				_db_name,
+				_x,
+				_KEY_MASS,
+				getNumber (_config >> "ItemInfo" >> "mass")
+			]
+		] call py3_fnc_callExtension;
 	} forEach _items;
 };
 
 save_weapon = {
-	params ["_base_class", "_db_name_weapon", "_db_name_magazines", "_db_name_alternate_magazines"];
+	params [
+		"_base_class",
+		"_db_name_weapon",
+		"_db_name_magazines",
+		"_db_name_alternate_magazines"
+	];
 	// Collect common magazines
 	private _primary_magazines_common = [];
 	// Collect common alternate magazines
@@ -93,15 +127,26 @@ save_weapon = {
 		// Description
 		[_db_name_weapon, _x] call save_description;
 		// Mass
-		[_db_name_weapon, _config_name, _key_mass, getNumber (_x >> "WeaponSlotsInfo" >> "mass")] call iniDB_write;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[
+				_db_name_weapon,
+				_config_name,
+				_KEY_MASS,
+				getNumber (_x >> "WeaponSlotsInfo" >> "mass")
+			]
+		] call py3_fnc_callExtension;
 		// Magazines
 		private _magazines = getArray (_x >> "magazines");
 		// Save magazine in common array if it's not already there
 		[_magazines, _primary_magazines_common] call add_unique_to_list;
 		// Save primary mags to DB
-		[_db_name_weapon, _config_name, _key_magazines, _magazines] call iniDB_write;
-		// Alternate magazines (such as grenade launcher). There can be multiple alternate 'muzzles',
-		// of which a grenade launcher is one of them.
+		[
+			"python.zakm_ingestion.save_to_db",
+			[_db_name_weapon, _config_name, _KEY_MAGAZINES, _magazines]
+		] call py3_fnc_callExtension;
+		// Alternate magazines (such as grenade launcher). There can be multiple alternate
+		// 'muzzles', of which a grenade launcher is one of them.
 		private _magazines = [];
 		{
 			// Save in array for this specific weapon if unique
@@ -111,23 +156,38 @@ save_weapon = {
 		// Do this for every alternative muzzle config for this weapon
 		} forEach ([_x] call alternate_muzzle_configs);
 		// Save alternate mags to DB
-		[_db_name_weapon, _config_name, _key_alternate_magazines, _magazines] call iniDB_write;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[_db_name_weapon, _config_name, _KEY_ALTERNATE_MAGAZINES, _magazines]
+		] call py3_fnc_callExtension;
 		// Save muzzle attachments
 		private _attachment_names = [_config_name, "muzzle"] call BIS_fnc_compatibleItems;
-		[_db_name_weapon, _config_name, _key_muzzle_attachments, _attachment_names] call iniDB_write;
-		[_attachment_names, _muzzle_attachments_common] call add_unique_to_list;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[_db_name_weapon, _config_name, _KEY_MUZZLE_ATTACHMENTS, _attachment_names]
+		] call py3_fnc_callExtension;
+		[_attachment_names, _MUZZLE_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save optic attachments
 		private _attachment_names = [_config_name, "optic"] call BIS_fnc_compatibleItems;
-		[_db_name_weapon, _config_name, _key_optic_attachments, _attachment_names] call iniDB_write;
-		[_attachment_names, _optic_attachments_common] call add_unique_to_list;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[_db_name_weapon, _config_name, _KEY_OPTIC_ATTACHMENTS, _attachment_names]
+		] call py3_fnc_callExtension;
+		[_attachment_names, _OPTIC_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save pointer attachments
 		private _attachment_names = [_config_name, "pointer"] call BIS_fnc_compatibleItems;
-		[_db_name_weapon, _config_name, _key_pointer_attachments, _attachment_names] call iniDB_write;
-		[_attachment_names, _pointer_attachments_common] call add_unique_to_list;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[_db_name_weapon, _config_name, _KEY_POINTER_ATTACHMENTS, _attachment_names]
+		] call py3_fnc_callExtension;
+		[_attachment_names, _POINTER_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save bipod attachments
 		private _attachment_names = [_config_name, "bipod"] call BIS_fnc_compatibleItems;
-		[_db_name_weapon, _config_name, _key_bipod_attachments, _attachment_names] call iniDB_write;
-		[_attachment_names, _bipod_attachments_common] call add_unique_to_list;
+		[
+			"python.zakm_ingestion.save_to_db",
+			[_db_name_weapon, _config_name, _KEY_BIPOD_ATTACHMENTS, _attachment_names]
+		] call py3_fnc_callExtension;
+		[_attachment_names, _BIPOD_ATTACHMENTS_COMMON] call add_unique_to_list;
 
 	} forEach ([_base_class] call weapon_configs);
 	// Save details for all primary mags for this category of weapons to their own DB
@@ -148,20 +208,30 @@ misc_configs = {
 	]
 };
 
-private _muzzle_attachments_common = [];
-private _optic_attachments_common = [];
-private _pointer_attachments_common = [];
-private _bipod_attachments_common = [];
+[
+	"Rifle",
+	"rifles",
+	"rifle_primary_magazines",
+	"rifle_alternate_magazines"
+] call save_weapon;
+[
+	"Pistol",
+	"pistols",
+	"pistol_primary_magazines", 
+	"pistol_alternate_magazines"
+] call save_weapon;
+[
+	"Launcher",
+	"launchers",
+	"launcher_primary_magazines",
+	"launcher_alternate_magazines"
+] call save_weapon;
 
-["Rifle", "rifles", "rifle_primary_magazines", "rifle_alternate_magazines"] call save_weapon;
-["Pistol", "pistols", "pistol_primary_magazines", "pistol_alternate_magazines"] call save_weapon;
-["Launcher", "launchers", "launcher_primary_magazines", "launcher_alternate_magazines"] call save_weapon;
+["muzzle_attachments", _MUZZLE_ATTACHMENTS_COMMON] call save_items;
+["optic_attachments", _OPTIC_ATTACHMENTS_COMMON] call save_items;
+["pointer_attachments", _POINTER_ATTACHMENTS_COMMON] call save_items;
+["bipod_attachments", _BIPOD_ATTACHMENTS_COMMON] call save_items;
 
-["muzzle_attachments", _muzzle_attachments_common] call save_items;
-["optic_attachments", _optic_attachments_common] call save_items;
-["pointer_attachments", _pointer_attachments_common] call save_items;
-["bipod_attachments", _bipod_attachments_common] call save_items;
+// {
 
-{
-
-} forEach (["UniformItem", "CfgWeapons"] call misc_configs);
+// } forEach (["UniformItem", "CfgWeapons"] call misc_configs);
