@@ -1,20 +1,79 @@
-// Common variables
-private _KEY_DISPLAY_NAME = "display_name";
-private _KEY_DESCRIPTION = "description";
-private _KEY_MASS = "mass";
-private _KEY_MAGAZINES = "magazines";
-private _KEY_ALTERNATE_MAGAZINES = "alternate_magazines";
+_KEY_DISPLAY_NAME = "display_name";
+_KEY_DESCRIPTION = "description";
+_KEY_MASS = "mass";
+_KEY_MAGAZINES = "magazines";
+_KEY_ALTERNATE_MAGAZINES = "alternate_magazines";
 
-private _KEY_MUZZLE_ATTACHMENTS = "muzzle_attachments";
-private _KEY_OPTIC_ATTACHMENTS = "optic_attachments";
-private _KEY_POINTER_ATTACHMENTS = "pointer_attachments";
-private _KEY_BIPOD_ATTACHMENTS = "bipod_attachments";
+_KEY_MUZZLE_ATTACHMENTS = "muzzle_attachments";
+_KEY_OPTIC_ATTACHMENTS = "optic_attachments";
+_KEY_POINTER_ATTACHMENTS = "pointer_attachments";
+_KEY_BIPOD_ATTACHMENTS = "bipod_attachments";
 
-private _MUZZLE_ATTACHMENTS_COMMON = [];
-private _OPTIC_ATTACHMENTS_COMMON = [];
-private _POINTER_ATTACHMENTS_COMMON = [];
-private _BIPOD_ATTACHMENTS_COMMON = [];
+_MUZZLE_ATTACHMENTS_COMMON = [];
+_OPTIC_ATTACHMENTS_COMMON = [];
+_POINTER_ATTACHMENTS_COMMON = [];
+_BIPOD_ATTACHMENTS_COMMON = [];
 
+_DB_QUEUE = [];
+_MAX_QUEUE = 5000;
+
+log_msg = {
+	/*
+		Description: 
+		Logs given text to both log file and system chat
+
+		Parameter(s):
+		0: STRING - String to log
+
+		Returns:
+		Nothing
+	*/
+	params ["_text"];
+	systemChat _text;
+	diag_log _text;
+};
+
+add_to_db_queue = {
+	/*
+		Description: 
+		Adds item to queue to save to db. When queue reaches a safe large number (5000)
+		then execute queue.
+		5000 is chosen as it's half the experimentally found 10000 array limit that can be
+		sent to Pythia.
+
+		Parameter(s):
+		0: STRING - Category
+		1: STRING - Row
+		2: STRING - Key
+		3: ANY - Value. It can be a string, number or array of strings
+
+		Returns:
+		Nothing
+	*/
+	params ["_cat", "_row", "_key", "_value"];
+	_DB_QUEUE set [count _DB_QUEUE, [_cat, _row, _key, _value]];
+	if (count _DB_QUEUE > 5000) then {
+		[] call execute_queue;
+	};
+};
+
+execute_queue = {
+	/*
+		Description: 
+		Sends all the items in the global queue to the db by calling the relevant Pythin
+		function via Pythia.
+
+		Parameter(s):
+		Nothing
+
+		Returns:
+		Nothing
+	*/
+	private _len = count _DB_QUEUE;
+	["python.zakm_ingestion.save_queue_to_db", [_DB_QUEUE]] call py3_fnc_callExtension;
+	_DB_QUEUE = [];
+	[format ["Saved %1 items to DB", _len]] call log_msg;
+};
 
 add_unique_to_list = {
 	/*
@@ -92,24 +151,18 @@ save_description = {
 	params ["_cat_name", "_config"];
 	// Human readable name
 	[
-		"python.zakm_ingestion.add_to_db",
-		[
-			_cat_name,
-			configName _config,
-			_KEY_DISPLAY_NAME,
-			getText (_config >> "displayName")
-		]
-	] call py3_fnc_callExtension;
+		_cat_name,
+		configName _config,
+		_KEY_DISPLAY_NAME,
+		getText (_config >> "displayName")
+	] call add_to_db_queue;
 	// Description
 	[
-		"python.zakm_ingestion.add_to_db",
-		[
-			_cat_name,
-			configName _config,
-			_KEY_DESCRIPTION,
-			getText (_config >> "descriptionShort")
-		]
-	] call py3_fnc_callExtension;
+		_cat_name,
+		configName _config,
+		_KEY_DESCRIPTION,
+		getText (_config >> "descriptionShort")
+	] call add_to_db_queue;
 };
 
 save_magazines = {
@@ -131,14 +184,11 @@ save_magazines = {
 		[_cat_name, _config] call save_description;
 		// Mass
 		[
-			"python.zakm_ingestion.add_to_db",
-			[
-				_cat_name,
-				_x,
-				_KEY_MASS,
-				getNumber (_config >> "mass")
-			]
-		] call py3_fnc_callExtension;
+			_cat_name,
+			_x,
+			_KEY_MASS,
+			getNumber (_config >> "mass")
+		] call add_to_db_queue;
 	} forEach _magazines;
 };
 
@@ -161,14 +211,11 @@ save_items = {
 		[_cat_name, _config] call save_description;
 		// Mass
 		[
-			"python.zakm_ingestion.add_to_db",
-			[
-				_cat_name,
-				_x,
-				_KEY_MASS,
-				getNumber (_config >> "ItemInfo" >> "mass")
-			]
-		] call py3_fnc_callExtension;
+			_cat_name,
+			_x,
+			_KEY_MASS,
+			getNumber (_config >> "ItemInfo" >> "mass")
+		] call add_to_db_queue;
 	} forEach _items;
 };
 
@@ -205,23 +252,17 @@ save_weapons = {
 		[_cat_name_weapon, _x] call save_description;
 		// Mass
 		[
-			"python.zakm_ingestion.add_to_db",
-			[
-				_cat_name_weapon,
-				_config_name,
-				_KEY_MASS,
-				getNumber (_x >> "WeaponSlotsInfo" >> "mass")
-			]
-		] call py3_fnc_callExtension;
+			_cat_name_weapon,
+			_config_name,
+			_KEY_MASS,
+			getNumber (_x >> "WeaponSlotsInfo" >> "mass")
+		] call add_to_db_queue;
 		// Magazines
 		private _magazines = getArray (_x >> "magazines");
 		// Save magazine in common array if it's not already there
 		[_magazines, _primary_magazines_common] call add_unique_to_list;
 		// Save primary mags to DB
-		[
-			"python.zakm_ingestion.add_to_db",
-			[_cat_name_weapon, _config_name, _KEY_MAGAZINES, _magazines]
-		] call py3_fnc_callExtension;
+		[_cat_name_weapon, _config_name, _KEY_MAGAZINES, _magazines] call add_to_db_queue;
 		// Alternate magazines (such as grenade launcher). There can be multiple alternate
 		// 'muzzles', of which a grenade launcher is one of them.
 		private _magazines = [];
@@ -234,36 +275,46 @@ save_weapons = {
 		} forEach ([_x] call alternate_muzzle_configs);
 		// Save alternate mags to DB
 		[
-			"python.zakm_ingestion.add_to_db",
-			[_cat_name_weapon, _config_name, _KEY_ALTERNATE_MAGAZINES, _magazines]
-		] call py3_fnc_callExtension;
+			_cat_name_weapon,
+			_config_name,
+			_KEY_ALTERNATE_MAGAZINES,
+			_magazines
+		] call add_to_db_queue;
 		// Save muzzle attachments
 		private _attachment_names = [_config_name, "muzzle"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.add_to_db",
-			[_cat_name_weapon, _config_name, _KEY_MUZZLE_ATTACHMENTS, _attachment_names]
-		] call py3_fnc_callExtension;
+			_cat_name_weapon,
+			_config_name,
+			_KEY_MUZZLE_ATTACHMENTS,
+			_attachment_names
+		] call add_to_db_queue;
 		[_attachment_names, _MUZZLE_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save optic attachments
 		private _attachment_names = [_config_name, "optic"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.add_to_db",
-			[_cat_name_weapon, _config_name, _KEY_OPTIC_ATTACHMENTS, _attachment_names]
-		] call py3_fnc_callExtension;
+			_cat_name_weapon,
+			_config_name,
+			_KEY_OPTIC_ATTACHMENTS,
+			_attachment_names
+		] call add_to_db_queue;
 		[_attachment_names, _OPTIC_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save pointer attachments
 		private _attachment_names = [_config_name, "pointer"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.add_to_db",
-			[_cat_name_weapon, _config_name, _KEY_POINTER_ATTACHMENTS, _attachment_names]
-		] call py3_fnc_callExtension;
+			_cat_name_weapon,
+			_config_name,
+			_KEY_POINTER_ATTACHMENTS,
+			_attachment_names
+		] call add_to_db_queue;
 		[_attachment_names, _POINTER_ATTACHMENTS_COMMON] call add_unique_to_list;
 		// Save bipod attachments
 		private _attachment_names = [_config_name, "bipod"] call BIS_fnc_compatibleItems;
 		[
-			"python.zakm_ingestion.add_to_db",
-			[_cat_name_weapon, _config_name, _KEY_BIPOD_ATTACHMENTS, _attachment_names]
-		] call py3_fnc_callExtension;
+			_cat_name_weapon,
+			_config_name,
+			_KEY_BIPOD_ATTACHMENTS,
+			_attachment_names
+		] call add_to_db_queue;
 		[_attachment_names, _BIPOD_ATTACHMENTS_COMMON] call add_unique_to_list;
 
 	} forEach ([_base_class] call weapon_configs);
@@ -294,21 +345,21 @@ misc_configs = {
 	]
 };
 
-hint "Starting rifles export to DB...";
+["Starting rifles export to DB..."] call log_msg;
 [
 	"Rifle",
 	"rifles",
 	"rifle_primary_magazines",
 	"rifle_alternate_magazines"
 ] call save_weapons;
-hint "Starting pistols export to DB...";
+["Starting pistols export to DB..."] call log_msg;
 [
 	"Pistol",
 	"pistols",
 	"pistol_primary_magazines", 
 	"pistol_alternate_magazines"
 ] call save_weapons;
-hint "Starting launchers export to DB...";
+["Starting launchers export to DB..."] call log_msg;
 [
 	"Launcher",
 	"launchers",
@@ -316,7 +367,7 @@ hint "Starting launchers export to DB...";
 	"launcher_alternate_magazines"
 ] call save_weapons;
 
-hint "Starting attachments export to DB...";
+["Starting attachments export to DB..."] call log_msg;
 ["muzzle_attachments", _MUZZLE_ATTACHMENTS_COMMON] call save_items;
 ["optic_attachments", _OPTIC_ATTACHMENTS_COMMON] call save_items;
 ["pointer_attachments", _POINTER_ATTACHMENTS_COMMON] call save_items;
@@ -325,3 +376,6 @@ hint "Starting attachments export to DB...";
 // {
 
 // } forEach (["UniformItem", "CfgWeapons"] call misc_configs);
+
+[] call execute_queue;
+["Export completed!"] call log_msg;
