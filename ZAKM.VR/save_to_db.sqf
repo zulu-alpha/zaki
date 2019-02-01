@@ -52,6 +52,9 @@ add_to_db_queue = {
 	*/
 	params ["_cat", "_row", "_key", "_value"];
 	_DB_QUEUE set [count _DB_QUEUE, [_cat, _row, _key, _value]];
+	if (_row == "optic_AMS_snd" and _key == "description") then {
+		[_value] call log_msg;
+	};
 	if (count _DB_QUEUE > 5000) then {
 		[] call execute_queue;
 	};
@@ -111,8 +114,8 @@ weapon_configs = {
 		// Is of the correct kind, is intended for the user to see (scope == 2) and has 
 		// no attatchements
 		"(configName _x isKindOf [_base_class, _config])
-			and (getNumber (_x >> 'scope') == 2)
-			and !isClass (_x >> 'LinkedItems')",
+		and (getNumber (_x >> 'scope') == 2)
+		and !isClass (_x >> 'LinkedItems')",
 		true
 	]
 };

@@ -10,7 +10,7 @@ def test_save_queue_to_db(tmp_path):
     save_queue_to_db([["rifles", "arifle_MX_F", "display_name", "MX"]])
     assert zakm_ingestion.DATABASE_PATH.is_file()
     with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
-        db = json.loads(open_file.read())
+        db = json.load(open_file)
         assert db == {
             "rifles" : {
                 "arifle_MX_F": {
@@ -33,7 +33,7 @@ def test_save_queue_to_db(tmp_path):
         ]
     ])
     with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
-        db = json.loads(open_file.read())
+        db = json.load(open_file)
         assert db == {
             "rifles" : {
                 "arifle_MX_F": {
@@ -54,7 +54,7 @@ def test_save_queue_to_db(tmp_path):
         ["launchers", "launch_RPG32_F", "magazines", ["RPG32_F", "RPG32_HE_F"]]
     ])
     with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
-        db = json.loads(open_file.read())
+        db = json.load(open_file)
         assert db == {
             "rifles" : {
                 "arifle_MX_F": {
@@ -74,6 +74,49 @@ def test_save_queue_to_db(tmp_path):
                 "launch_RPG32_F": {
                     "display_name": "RPG-32",
                     "magazines": ["RPG32_F", "RPG32_HE_F"]
+                }
+            }
+        }
+
+
+def test_utf_sanitization(tmp_path):
+    from python.zakm_ingestion import save_queue_to_db
+    from python import zakm_ingestion
+
+    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
+
+    save_queue_to_db([
+        ["rifles", "arifle_MX_F", "display_name", "MX 6.5\u00a0mm"],
+        ["optic_attachments", "optic_Nightstalker", "description",
+         "Nightstalker Sight<br />Magnification: 4x\u201310x"],
+        ["rifle_primary_magazines", "30Rnd_65x39_caseless_mag", "description",
+         ("Caliber: 6.5x39 mm \u2012 STANAG Caseless"
+          "<br />Rounds: 30<br />Used in: MX/C/M/SW/3GL")],
+        ["rifles", "srifle_EBR_F", "description",
+         "Assault rifle <br/>Caliber: 7.62x51 mm NATO"]
+    ])
+
+    assert zakm_ingestion.DATABASE_PATH.is_file()
+    with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
+        db = json.load(open_file)
+        assert db == {
+            "rifles" : {
+                "arifle_MX_F": {
+                    "display_name": "MX 6.5 mm"
+                },
+                "srifle_EBR_F": {
+                    "description": "Assault rifle  Caliber: 7.62x51 mm NATO"
+                }
+            },
+            "optic_attachments": {
+                "optic_Nightstalker": {
+                    "description": "Nightstalker Sight Magnification: 4x-10x"
+                }
+            },
+            "rifle_primary_magazines": {
+                "30Rnd_65x39_caseless_mag": {
+                    "description": ("Caliber: 6.5x39 mm - STANAG Caseless"
+                                    " Rounds: 30 Used in: MX/C/M/SW/3GL")
                 }
             }
         }
