@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Union, List, Iterable, Tuple
 
 
-DATABASE_PATH = Path("zakm_db.json")
+DATABASE_PATH = Path("zaki_db.json")
 Value = Union[str, int, float, List[str]]
 Item = Tuple[str, str, str, Value]
 ItemQueue = Iterable[Item]

@@ -121,7 +121,7 @@ execute_queue = {
         Nothing
     */
     private _len = count _DB_QUEUE;
-    ["python.zakm_ingestion.save_queue_to_db", [_DB_QUEUE]] call py3_fnc_callExtension;
+    ["python.zaki_ingestion.save_queue_to_db", [_DB_QUEUE]] call py3_fnc_callExtension;
     _DB_QUEUE = [];
     [format ["Saved %1 items to DB", _len]] call log_msg;
 };
@@ -157,7 +157,7 @@ save_description = {
 
 
 ["Starting export to DB..."] call log_msg;
-["python.zakm_ingestion.delete_db", []] call py3_fnc_callExtension;
+["python.zaki_ingestion.delete_db", []] call py3_fnc_callExtension;
 
 // Save this lookup in variable for performance improvement
 private _configCfgWeapons = configFile >> "CfgWeapons";  
@@ -379,5 +379,5 @@ private _putList = [];
 ];
 
 [] call execute_queue;
-private _path = ["python.zakm_ingestion.get_db_path", []] call py3_fnc_callExtension;
+private _path = ["python.zaki_ingestion.get_db_path", []] call py3_fnc_callExtension;
 [format ["Finished! DB file located at %1", _path]] call log_msg;

@@ -2,14 +2,14 @@ import json
 
 
 def test_save_queue_to_db(tmp_path):
-    from python.zakm_ingestion import save_queue_to_db
-    from python import zakm_ingestion
+    from python.zaki_ingestion import save_queue_to_db
+    from python import zaki_ingestion
 
-    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
+    zaki_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
 
     save_queue_to_db([["rifles", "arifle_MX_F", "display_name", "MX"]])
-    assert zakm_ingestion.DATABASE_PATH.is_file()
-    with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
+    assert zaki_ingestion.DATABASE_PATH.is_file()
+    with open(str(zaki_ingestion.DATABASE_PATH), "r") as open_file:
         db = json.load(open_file)
         assert db == {
             "rifles" : {
@@ -32,7 +32,7 @@ def test_save_queue_to_db(tmp_path):
             ]
         ]
     ])
-    with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
+    with open(str(zaki_ingestion.DATABASE_PATH), "r") as open_file:
         db = json.load(open_file)
         assert db == {
             "rifles" : {
@@ -53,7 +53,7 @@ def test_save_queue_to_db(tmp_path):
         ["launchers", "launch_RPG32_F", "display_name", "RPG-32"],
         ["launchers", "launch_RPG32_F", "magazines", ["RPG32_F", "RPG32_HE_F"]]
     ])
-    with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
+    with open(str(zaki_ingestion.DATABASE_PATH), "r") as open_file:
         db = json.load(open_file)
         assert db == {
             "rifles" : {
@@ -80,10 +80,10 @@ def test_save_queue_to_db(tmp_path):
 
 
 def test_utf_sanitization(tmp_path):
-    from python.zakm_ingestion import save_queue_to_db
-    from python import zakm_ingestion
+    from python.zaki_ingestion import save_queue_to_db
+    from python import zaki_ingestion
 
-    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
+    zaki_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
 
     save_queue_to_db([
         ["rifles", "arifle_MX_F", "display_name", "MX 6.5\u00a0mm"],
@@ -96,8 +96,8 @@ def test_utf_sanitization(tmp_path):
          "Assault rifle <br/>Caliber: 7.62x51 mm NATO"]
     ])
 
-    assert zakm_ingestion.DATABASE_PATH.is_file()
-    with open(str(zakm_ingestion.DATABASE_PATH), "r") as open_file:
+    assert zaki_ingestion.DATABASE_PATH.is_file()
+    with open(str(zaki_ingestion.DATABASE_PATH), "r") as open_file:
         db = json.load(open_file)
         assert db == {
             "rifles" : {
@@ -123,21 +123,21 @@ def test_utf_sanitization(tmp_path):
 
 
 def test_delete(tmp_path):
-    from python.zakm_ingestion import delete_db
-    from python import zakm_ingestion
+    from python.zaki_ingestion import delete_db
+    from python import zaki_ingestion
 
-    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
+    zaki_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
 
-    with open(str(zakm_ingestion.DATABASE_PATH), "w") as open_file:
+    with open(str(zaki_ingestion.DATABASE_PATH), "w") as open_file:
         open_file.write("test")
     delete_db()
-    assert not zakm_ingestion.DATABASE_PATH.is_file()
+    assert not zaki_ingestion.DATABASE_PATH.is_file()
 
 
 def test_get_db_path(tmp_path):
-    from python.zakm_ingestion import get_db_path
-    from python import zakm_ingestion
+    from python.zaki_ingestion import get_db_path
+    from python import zaki_ingestion
 
-    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
+    zaki_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
 
-    assert get_db_path() == str(zakm_ingestion.DATABASE_PATH.absolute())
+    assert get_db_path() == str(zaki_ingestion.DATABASE_PATH.absolute())
