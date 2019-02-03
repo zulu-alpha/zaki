@@ -126,9 +126,18 @@ def test_delete(tmp_path):
     from python.zakm_ingestion import delete_db
     from python import zakm_ingestion
 
-    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.yaml"
+    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
 
     with open(str(zakm_ingestion.DATABASE_PATH), "w") as open_file:
         open_file.write("test")
     delete_db()
     assert not zakm_ingestion.DATABASE_PATH.is_file()
+
+
+def test_get_db_path(tmp_path):
+    from python.zakm_ingestion import get_db_path
+    from python import zakm_ingestion
+
+    zakm_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
+
+    assert get_db_path() == str(zakm_ingestion.DATABASE_PATH.absolute())

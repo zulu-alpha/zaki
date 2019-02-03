@@ -50,3 +50,8 @@ def add_to_db_dict(db: dict, category: str, row: str, key: str, value: Value) ->
         db[category][row] = dict()
     db[category][row][key] = sanitize(value)
     return db
+
+
+def get_db_path() -> str:
+    """Returns a string showing the absolute path to the db file"""
+    return str(DATABASE_PATH.absolute())

@@ -379,4 +379,5 @@ private _putList = [];
 ];
 
 [] call execute_queue;
-["Finished export to DB"] call log_msg;
+private _path = ["python.zakm_ingestion.get_db_path", []] call py3_fnc_callExtension;
+[format ["Finished! DB file located at %1", _path]] call log_msg;
