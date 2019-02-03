@@ -102,7 +102,7 @@ add_to_db_queue = {
         Nothing
     */
     params ["_cat", "_row", "_key", "_value"];
-    _DB_QUEUE set [count _DB_QUEUE, [_cat, _row, _key, _value]];
+    _DB_QUEUE pushBackUnique [_cat, _row, _key, _value];
     if (count _DB_QUEUE > 5000) then {
         [] call execute_queue;
     };
@@ -247,7 +247,8 @@ private _configCfgWeapons = configFile >> "CfgWeapons";
         };
         /* Weapon, at the bottom to avoid adding binos */
         case (isClass (_x >> "WeaponSlotsInfo") and
-            {getNumber (_x >> 'type') != _TYPE_BINOCULAR_AND_NVG}): {
+            {getNumber (_x >> 'type') != _TYPE_BINOCULAR_AND_NVG} and 
+            {!isClass (_x >> 'LinkedItems')}): {
             switch (getNumber (_x >> "type")) do {
                 case _TYPE_WEAPON_PRIMARY: {
                     [_CAT_RIFLES, _x] call save_description;
