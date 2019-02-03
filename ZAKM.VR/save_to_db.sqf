@@ -157,6 +157,7 @@ save_description = {
 
 
 ["Starting export to DB..."] call log_msg;
+["python.zakm_ingestion.delete_db", []] call py3_fnc_callExtension;
 
 // Save this lookup in variable for performance improvement
 private _configCfgWeapons = configFile >> "CfgWeapons";  

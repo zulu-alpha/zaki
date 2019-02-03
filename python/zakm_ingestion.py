@@ -9,6 +9,12 @@ Item = Tuple[str, str, str, Value]
 ItemQueue = Iterable[Item]
 
 
+def delete_db() -> None:
+    """Deletes the db. Used to clear out an old db from a previous session"""
+    if DATABASE_PATH.is_file():
+        DATABASE_PATH.unlink()
+
+
 def save_queue_to_db(item_queue: ItemQueue) -> None:
     """Add each item in the given queue to the existing (or new) json db file"""
     if DATABASE_PATH.is_file():
