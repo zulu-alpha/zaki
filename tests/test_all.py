@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 
 
 def test_save_queue_to_db(tmp_path):
@@ -141,3 +142,109 @@ def test_get_db_path(tmp_path):
     zaki_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
 
     assert get_db_path() == str(zaki_ingestion.DATABASE_PATH.absolute())
+
+
+def test_sort_db(tmp_path):
+    from python.zaki_ingestion import sort_db
+    from python import zaki_ingestion
+
+    zaki_ingestion.DATABASE_PATH = tmp_path / "new_file.json"
+
+    unsorted_dic = OrderedDict([
+        (
+            "Vests", OrderedDict([
+                (
+                    "CUP_V_B_BAF_DDPM_Osprey_Mk3_AutomaticRifleman", OrderedDict([
+                        ("display_name", "Osprey Mk3 DDPM (Automatic Rifleman)"),
+                        ("description", "No Armor")
+                    ])
+                ),
+                (
+                    "V_HarnessO_brn", OrderedDict([
+                        ("display_name", "LBV Harness"),
+                        ("description", "No Armor")
+                    ])
+                ),
+                (
+                    "V_PlateCarrier1_blk", OrderedDict([
+                        ("display_name", "Carrier Lite (Black)"),
+                        ("description", "Armor Level III")
+                    ])
+                )
+            ])
+        ),
+        (
+            "Binoculars", OrderedDict([
+                (
+                    "Binocular", OrderedDict([
+                        ("display_name", "Binoculars"),
+                        ("description", "Magnification: 4x-12x")
+                    ])
+                ),
+                (
+                    "ACE_Yardage450", OrderedDict([
+                        ("display_name", "Yardage 450"),
+                        ("description", "Laser Rangefinder")
+                    ])
+                ),
+                (
+                    "Laserdesignator_02_ghex_F", OrderedDict([
+                        ("display_name", "Laser Designator (Green Hex)"),
+                        ("description", "Magnification: 1x-20x")
+                    ])
+                )
+            ])
+        )
+    ])
+    sorted_dic = OrderedDict([
+        (
+            "Binoculars", OrderedDict([
+                (
+                    "Binocular", OrderedDict([
+                        ("display_name", "Binoculars"),
+                        ("description", "Magnification: 4x-12x")
+                    ])
+                ),
+                (
+                    "Laserdesignator_02_ghex_F", OrderedDict([
+                        ("display_name", "Laser Designator (Green Hex)"),
+                        ("description", "Magnification: 1x-20x")
+                    ])
+                ),
+                (
+                    "ACE_Yardage450", OrderedDict([
+                        ("display_name", "Yardage 450"),
+                        ("description", "Laser Rangefinder")
+                    ])
+                )
+            ])
+        ),
+        (
+            "Vests", OrderedDict([
+                (
+                    "V_PlateCarrier1_blk", OrderedDict([
+                        ("display_name", "Carrier Lite (Black)"),
+                        ("description", "Armor Level III")
+                    ])
+                ),
+                (
+                    "V_HarnessO_brn", OrderedDict([
+                        ("display_name", "LBV Harness"),
+                        ("description", "No Armor")
+                    ])
+                ),
+                (
+                    "CUP_V_B_BAF_DDPM_Osprey_Mk3_AutomaticRifleman", OrderedDict([
+                        ("display_name", "Osprey Mk3 DDPM (Automatic Rifleman)"),
+                        ("description", "No Armor")
+                    ])
+                )
+            ])
+        )
+    ])
+    with open(str(zaki_ingestion.DATABASE_PATH), "w") as open_file:
+        json.dump(unsorted_dic, open_file)
+    sort_db("display_name")
+    with open(str(zaki_ingestion.DATABASE_PATH), "r") as open_file:
+        db = json.load(open_file, object_pairs_hook=OrderedDict)
+    assert db == sorted_dic
