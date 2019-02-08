@@ -379,8 +379,6 @@ private _putList = [];
 ];
 
 [] call execute_queue;
-private _path = [
-    "python.zaki_ingestion.sort_db", [_KEY_DISPLAY_NAME]
-] call py3_fnc_callExtension;
+["python.zaki_ingestion.sort_db", [_KEY_DISPLAY_NAME]] call py3_fnc_callExtension;
 private _path = ["python.zaki_ingestion.get_db_path", []] call py3_fnc_callExtension;
 [format ["Finished! DB file located at %1", _path]] call log_msg;
