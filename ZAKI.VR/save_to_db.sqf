@@ -1,6 +1,6 @@
 /*
     Author:
-    Phoenix, but based on ACE3 arsenal function by Dedmen to increase my expectancy:
+    Phoenix, but based on ACE3 arsenal function by Dedmen to increase my life expectancy:
     https://github.com/acemod/ACE3/blob/master/addons/arsenal/functions/fnc_scanConfig.sqf
 
     Description:
@@ -13,9 +13,9 @@
     Nothing
 */
 
-_CAT_RIFLES = "Rifles";
+_CAT_RIFLES = "Primary_Weapons";
 _CAT_SIDEARMS = "Sidearms";
-_CAT_SECONDARY = "Secondary";
+_CAT_SECONDARY = "Secondary_Weapons";
 _CAT_OPTIC_ATTACHMENTS = "Optic_Attachments";
 _CAT_SIDE_ATTACHMENTS = "Side_Attachments";
 _CAT_MUZZLE_ATTACHMENTS = "Muzzle_Attachments";
