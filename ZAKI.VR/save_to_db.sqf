@@ -35,7 +35,7 @@ _CAT_WATCHES = "Watches";
 _CAT_INTERFACES = "Interfaces";
 _CAT_GRENADES = "Grenades";
 _CAT_EXPLOSIVES = "Explosives";
-_CAT_MISC = "Miscelaneous";
+_CAT_MISC = "Miscellaneous";
 
 _KEY_DISPLAY_NAME = "display_name";
 _KEY_DESCRIPTION = "description";
