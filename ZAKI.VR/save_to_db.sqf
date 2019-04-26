@@ -13,13 +13,13 @@
     Nothing
 */
 
-_CAT_RIFLES = "Primary_Weapons";
+_CAT_RIFLES = "Primary_weapons";
 _CAT_SIDEARMS = "Sidearms";
-_CAT_SECONDARY = "Secondary_Weapons";
-_CAT_OPTIC_ATTACHMENTS = "Optic_Attachments";
-_CAT_SIDE_ATTACHMENTS = "Side_Attachments";
-_CAT_MUZZLE_ATTACHMENTS = "Muzzle_Attachments";
-_CAT_BIPOD_ATTACHMENTS = "Bipod_Attachments";
+_CAT_SECONDARY = "Secondary_weapons";
+_CAT_OPTIC_ATTACHMENTS = "Optic_attachments";
+_CAT_SIDE_ATTACHMENTS = "Side_attachments";
+_CAT_MUZZLE_ATTACHMENTS = "Muzzle_attachments";
+_CAT_BIPOD_ATTACHMENTS = "Bipod_attachments";
 _CAT_MAGAZINES = "Magazines";
 _CAT_HEADGEAR = "Headgear";
 _CAT_UNIFORMS = "Uniforms";
