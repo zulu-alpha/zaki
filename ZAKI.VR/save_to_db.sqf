@@ -13,29 +13,29 @@
     Nothing
 */
 
-_CAT_RIFLES = "Primary_weapons";
-_CAT_SIDEARMS = "Sidearms";
-_CAT_SECONDARY = "Secondary_weapons";
-_CAT_OPTIC_ATTACHMENTS = "Optic_attachments";
-_CAT_SIDE_ATTACHMENTS = "Side_attachments";
-_CAT_MUZZLE_ATTACHMENTS = "Muzzle_attachments";
-_CAT_BIPOD_ATTACHMENTS = "Bipod_attachments";
-_CAT_MAGAZINES = "Magazines";
-_CAT_HEADGEAR = "Headgear";
-_CAT_UNIFORMS = "Uniforms";
-_CAT_VESTS = "Vests";
-_CAT_BACKPACKS = "Backpacks";
-_CAT_GOGGLES = "Goggles";
-_CAT_NVGS = "NVGs";
-_CAT_BINOCULARS = "Binoculars";
-_CAT_MAPS = "Maps";
-_CAT_COMPASSES = "Compasses";
-_CAT_RADIOS = "Radios";
-_CAT_WATCHES = "Watches";
-_CAT_INTERFACES = "Interfaces";
-_CAT_GRENADES = "Grenades";
-_CAT_EXPLOSIVES = "Explosives";
-_CAT_MISC = "Miscellaneous";
+_CAT_RIFLES = "primary_weapons";
+_CAT_SIDEARMS = "sidearms";
+_CAT_SECONDARY = "secondary_weapons";
+_CAT_OPTIC_ATTACHMENTS = "optic_attachments";
+_CAT_SIDE_ATTACHMENTS = "side_attachments";
+_CAT_MUZZLE_ATTACHMENTS = "muzzle_attachments";
+_CAT_BIPOD_ATTACHMENTS = "bipod_attachments";
+_CAT_MAGAZINES = "magazines";
+_CAT_HEADGEAR = "headgear";
+_CAT_UNIFORMS = "uniforms";
+_CAT_VESTS = "vests";
+_CAT_BACKPACKS = "backpacks";
+_CAT_GOGGLES = "goggles";
+_CAT_NVGS = "nvgs";
+_CAT_BINOCULARS = "binoculars";
+_CAT_MAPS = "maps";
+_CAT_COMPASSES = "compasses";
+_CAT_RADIOS = "radios";
+_CAT_WATCHES = "watches";
+_CAT_INTERFACES = "interfaces";
+_CAT_GRENADES = "grenades";
+_CAT_EXPLOSIVES = "explosives";
+_CAT_MISC = "miscellaneous";
 
 _KEY_DISPLAY_NAME = "display_name";
 _KEY_DESCRIPTION = "description";
